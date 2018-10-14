@@ -31,7 +31,7 @@ def create_app(test_config=None):
     # a simple page that says hello
     @app.route('/')
     def hello():
-        return 'Hello, World! Hello Kenway!'
+        return 'Hello, World! Hello Kenway! I am updated!'
 
 
     # new code for db
