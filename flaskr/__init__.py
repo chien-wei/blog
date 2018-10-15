@@ -4,15 +4,15 @@ from flask import Flask
 
 def create_app(test_config=None):
     """
-    http://flask.pocoo.org/docs/1.0/api/
+    For more details, see http://flask.pocoo.org/docs/1.0/api/
     :param test_config:
     :return:
     """
     # create and configure the app
     app = Flask(__name__, instance_relative_config=True)
     app.config.from_mapping(
-        SECRET_KEY='dev',
-        DATABASE='localhost',
+        SECRET_KEY=os.environ['SECRET_KEY'],
+        MONGODB=os.environ['MONGODB']
     )
 
     if test_config is None:
@@ -28,21 +28,11 @@ def create_app(test_config=None):
     except OSError:
         pass
 
-    # a simple page that says hello
-    @app.route('/')
-    def hello():
-        return 'Hello, World! Hello Kenway! I am updated!'
-
-
-    # new code for db
-    """from . import db
+    from . import db
     db.init_app(app)
-
-    from . import auth
-    app.register_blueprint(auth.bp)
 
     from . import blog
     app.register_blueprint(blog.bp)
-    app.add_url_rule('/', endpoint='index')"""
+    app.add_url_rule('/', endpoint='index')
 
     return app
