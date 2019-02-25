@@ -1,5 +1,6 @@
 import os
 from flask import Flask
+import config
 
 
 def create_app(test_config=None):
@@ -8,12 +9,28 @@ def create_app(test_config=None):
     :param test_config:
     :return:
     """
+    print("test_config", test_config)
     # create and configure the app
     app = Flask(__name__, instance_relative_config=True)
-    app.config.from_mapping(
-        SECRET_KEY=os.environ['SECRET_KEY'],
-        MONGODB=os.environ['MONGODB']
-    )
+
+    if "SECRET_KEY" in os.environ:
+        # production
+        app.config.from_mapping(
+            SECRET_KEY=os.environ['SECRET_KEY'],
+            MONGODB=os.environ['MONGODB']
+        )
+
+    elif test_config and 'TESTING' in test_config:
+        # testing
+        app.config.from_mapping(
+            MONGODB=config.MONGODB
+        )
+    else:
+        # development
+        app.config.from_mapping(
+            MONGODB=config.MONGODB
+        )
+
 
     if test_config is None:
         # load the instance config, if it exists, when not testing
@@ -27,6 +44,11 @@ def create_app(test_config=None):
         os.makedirs(app.instance_path)
     except OSError:
         pass
+
+    @app.route('/hello')
+    def hello():
+        return 'Hello, World!'
+
 
     from . import db
     db.init_app(app)
